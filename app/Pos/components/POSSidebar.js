@@ -44,10 +44,11 @@ const POSSidebar = ({ subscriptionData }) => {
         left: '0px',
         top: '64px',
         background: '#1D50B6',
-        borderRadius: '1.76812px',
+        borderRadius: '0px',
         zIndex: 1,
         margin: 0,
-        padding: 0
+        padding: 0,
+        border: 'none'
       }}
     >
       {/* POS Title */}

@@ -272,7 +272,7 @@ const QuickMenu = ({ subscriptionData }) => {
 
 
 // Main Navbar Component
-const Navbar = ({ subscriptionData }) => {
+const Navbar = ({ subscriptionData, onToggleSidebar }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showCashUpPopup, setShowCashUpPopup] = useState(false);
@@ -346,7 +346,8 @@ const Navbar = ({ subscriptionData }) => {
     }
 
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // Only handle menu click outside if not in POS mode (where sidebar toggle is used)
+      if (!onToggleSidebar && menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(false);
       }
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -367,24 +368,26 @@ const Navbar = ({ subscriptionData }) => {
     };
   }, []);
 
+  // Notifications disabled in POS - no subscription needed
   useEffect(() => {
-    if (!storeId) return;
+    // Disabled for POS
+    // if (!storeId) return;
 
-    const notificationsRef = collection(db, 'notifications');
-    const notificationsQuery = query(
-      notificationsRef,
-      where('storeId', '==', storeId),
-      where('status', '==', orderStatus.Pending)
-    );
+    // const notificationsRef = collection(db, 'notifications');
+    // const notificationsQuery = query(
+    //   notificationsRef,
+    //   where('storeId', '==', storeId),
+    //   where('status', '==', orderStatus.Pending)
+    // );
 
-    const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
-      // Count only pending (unread/actionable) notifications so counter decreases appropriately
-      setNotificationCount(snapshot.size);
-    }, (error) => {
-      console.error("Error fetching notification count:", error);
-    });
+    // const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
+    //   // Count only pending (unread/actionable) notifications so counter decreases appropriately
+    //   setNotificationCount(snapshot.size);
+    // }, (error) => {
+    //   console.error("Error fetching notification count:", error);
+    // });
 
-    return () => unsubscribe();
+    // return () => unsubscribe();
   }, [storeId]);
 
   // Subscribe to today's shift for this user to reflect Time In/Out
@@ -941,7 +944,7 @@ const Navbar = ({ subscriptionData }) => {
   };
 
   return (
-    <nav style={{ position: "fixed", top: "0px", left: "0px", right: "0px", width: "100%", zIndex: "50", backgroundColor: "#1D50B6", opacity: "1", margin: 0, padding: "8px 16px", boxSizing: "border-box" }} className="flex items-center text-white">
+    <nav style={{ position: "fixed", top: "0px", left: "0px", right: "0px", width: "100%", height: "64px", zIndex: "50", backgroundColor: "#1D50B6", opacity: "1", margin: 0, padding: "8px 16px", boxSizing: "border-box", border: "none" }} className="flex items-center text-white">
       {toastMsg && (
         <div className="fixed top-[64px] left-1/2 -translate-x-1/2 z-[60]">
           <div className="px-4 py-2 rounded-md bg-green-100 text-green-800 border border-green-200 text-sm shadow-sm">{toastMsg}</div>
@@ -954,12 +957,21 @@ const Navbar = ({ subscriptionData }) => {
             alt="Menu"
             className="cursor-pointer"
             style={{ width: '24px', height: '24px' }}
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={() => {
+              // In POS, toggle sidebar instead of showing menu
+              if (onToggleSidebar) {
+                onToggleSidebar();
+              } else {
+                // Fallback for admin pages
+                setShowMenu(!showMenu);
+              }
+            }}
           />
-          {usePathname() === '/Admin' && (
+          {usePathname() === '/Admin' && !onToggleSidebar && (
             <span className="ml-3 font-bold" style={{ fontSize: '18px', lineHeight: '22px' }}>Admin</span>
           )}
-          {showMenu && (
+          {/* Only show QuickMenu in admin pages, not in POS */}
+          {showMenu && !onToggleSidebar && (
             <div className="absolute left-0 w-[400px] bg-white rounded-lg shadow-lg overflow-hidden" style={{ zIndex: 10, top: '40px' }}>
               <div className="custom-notch"></div>
               <QuickMenu subscriptionData={subscriptionData} />
@@ -973,31 +985,36 @@ const Navbar = ({ subscriptionData }) => {
       </div>
 
       <div className="flex items-center space-x-4 flex-1 justify-end">
-        <div className="relative">
-          <img
-            src="/navbar/bell.svg"
-            alt="Notifications"
-            className="cursor-pointer"
-            style={{ width: '24px', height: '24px' }}
-            onClick={() => router.push('/Admin/Notifications')}
-          />
-          {notificationCount > 0 && (
-            <span className="bg-yellow-500 text-black font-bold px-1 text-xs rounded-full absolute -top-2 -right-2">
-              {notificationCount > 9 ? '9+' : notificationCount}
-            </span>
-          )}
-        </div>
+        {/* Chat and Notifications disabled in POS */}
+        {false && (
+          <>
+            <div className="relative">
+              <img
+                src="/navbar/bell.svg"
+                alt="Notifications"
+                className="cursor-pointer"
+                style={{ width: '24px', height: '24px' }}
+                onClick={() => router.push('/Admin/Notifications')}
+              />
+              {notificationCount > 0 && (
+                <span className="bg-yellow-500 text-black font-bold px-1 text-xs rounded-full absolute -top-2 -right-2">
+                  {notificationCount > 9 ? '9+' : notificationCount}
+                </span>
+              )}
+            </div>
 
-        <div className="relative">
-          <Link href="Admin/Chat">
-            <img
-              src="/navbar/chat.svg"
-              alt="Chat"
-              className="cursor-pointer hover:opacity-90"
-              style={{ width: '24px', height: '24px' }}
-            />
-          </Link>
-        </div>
+            <div className="relative">
+              <Link href="Admin/Chat">
+                <img
+                  src="/navbar/chat.svg"
+                  alt="Chat"
+                  className="cursor-pointer hover:opacity-90"
+                  style={{ width: '24px', height: '24px' }}
+                />
+              </Link>
+            </div>
+          </>
+        )}
         <div ref={profileRef} className="relative">
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setShowProfileMenu(!showProfileMenu)}>
             <div className="h-8 border-l border-white/30" />

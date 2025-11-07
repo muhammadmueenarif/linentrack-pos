@@ -17,6 +17,7 @@ const POSContent = () => {
   const [userData, setUserData] = useState(null);
   const [storeId, setStoreId] = useState(null);
   const [subscriptionData, setSubscriptionData] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { stopClock, resumeClock } = useClock();
 
   // Get user data and store ID
@@ -79,13 +80,12 @@ const POSContent = () => {
 
   return (
     <div className="flex h-screen">
-      <BackgroundBlur isActive={showPINPopup || hasManualClockIn}>
-        <Navbar />
-        <POSSidebar subscriptionData={subscriptionData} />
-        <div className="flex-1" style={{ marginLeft: '280px', marginTop: '70px', marginRight: '0px' }}>
-          <PosMainComponent />
-        </div>
-      </BackgroundBlur>
+      <Navbar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      {isSidebarOpen && <POSSidebar subscriptionData={subscriptionData} />}
+      <div className="flex-1" style={{ marginLeft: isSidebarOpen ? '280px' : '0px', marginTop: '70px', marginRight: '0px', transition: 'margin-left 0.3s ease' }}>
+        <PosMainComponent isSidebarOpen={isSidebarOpen} />
+      </div>
+      <BackgroundBlur isActive={showPINPopup || hasManualClockIn} />
 
       {/* Manual Clock-In Modal */}
       {hasManualClockIn && userData && storeId && (

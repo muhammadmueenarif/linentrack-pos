@@ -5,8 +5,9 @@ import Image from 'next/image';
 import { useOrder } from '../State/OrderProvider';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config';
+import { CollectionName } from '../../enum/CollectionName';
 
-const MainBody = () => {
+const MainBody = ({ isSidebarOpen = true }) => {
   // State for selections
   const [selectedStainDamage, setSelectedStainDamage] = useState([]);
   const [selectedPhysicalDamage, setSelectedPhysicalDamage] = useState([]);
@@ -76,18 +77,19 @@ const MainBody = () => {
     fetchStoreSettings();
   }, []);
 
-  // Fetch products from Firestore with category "Dry Cleaning" filtering by storeId and userId
+  // Fetch products from Firestore with category "Dry Cleaning" filtering by storeId and userId (admin/owner ID)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const productsRef = collection(db, 'products');
-        // Get storeId and userId from localStorage
+        const productsRef = collection(db, CollectionName.PRODUCTS);
+        // Get storeId and ownerAdminId (userId) from localStorage
         const storeId = localStorage.getItem('selectedStoreId');
         const userData = JSON.parse(localStorage.getItem('userData'));
-        const userId = userData?.id;
+        // Use ownerAdminId (admin/owner ID) to match products created in admin panel
+        const userId = userData?.ownerAdminId || userData?.userId;
         
         if (!storeId || !userId) {
-          console.error("Store ID or User ID missing");
+          console.error("Store ID or Admin/Owner ID missing");
           return;
         }
         
@@ -273,15 +275,23 @@ const MainBody = () => {
 
   return (
     <motion.div   
-      className="flex-grow overflow-y-auto w-full h-full"
+      className="flex-grow overflow-y-auto w-full h-full flex flex-col"
       style={{ 
         marginTop: "0px",
-        padding: "10px 20px"
+        padding: "10px 20px",
+        paddingRight: '400px', // Account for right sidebar
+        transition: 'padding-right 0.3s ease'
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      <div 
+        className="w-full"
+        style={{ 
+          padding: '0 20px'
+        }}
+      >
       {/* Service Selection Header */}
       <motion.h2
         className="text-2xl font-bold mb-6 text-black"
@@ -414,7 +424,7 @@ const MainBody = () => {
           transition={{ delay: 0.2 }}
         >
           <h3 className="text-lg font-semibold mb-2 text-gray-800">Stain Damage</h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" style={{ maxWidth: '100%' }}>
             {stainDamageTypes.map((damage, index) => (
               <motion.button
                 key={index}
@@ -452,7 +462,7 @@ const MainBody = () => {
           transition={{ delay: 0.3 }}
         >
           <h3 className="text-lg font-semibold mb-2 text-gray-800">Physical Damage</h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" style={{ maxWidth: '100%' }}>
             {physicalDamageTypes.map((damage, index) => (
               <motion.button
                 key={index}
@@ -490,7 +500,7 @@ const MainBody = () => {
           transition={{ delay: 0.4 }}
         >
           <h3 className="text-lg font-semibold mb-2 text-gray-800">Select Colour</h3>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4" style={{ maxWidth: '100%' }}>
             {['#000000', '#404040', '#808080', '#C0C0C0', '#FFFFFF', '#000080',
               '#0000FF', '#40E0D0', '#00FFFF', '#FF0000', '#FFA500', '#FFFF00'].map((color, index) => (
                 <motion.button
@@ -525,6 +535,7 @@ const MainBody = () => {
       >
         Add Item
       </motion.button>
+      </div>
     </motion.div>
   );
 };

@@ -22,7 +22,7 @@ export const OrderItemsList = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full h-full flex flex-col" style={{ minHeight: 0 }}>
       {/* Header - Fixed */}
       <div className="flex-shrink-0 bg-white z-10 mb-4">
         <div className="flex text-left text-sm font-semibold text-gray-700">
@@ -34,7 +34,7 @@ export const OrderItemsList = () => {
       </div>
       
       {/* Scrollable Items List */}
-      <div className="flex-1 overflow-y-auto space-y-2" style={{ maxHeight: 'calc(100% - 30px)' }}>
+      <div className="flex-1 overflow-y-auto space-y-2" style={{ minHeight: 0 }}>
         <AnimatePresence mode="popLayout">
           {selectedItems && selectedItems.map((item, index) => (
             <motion.div

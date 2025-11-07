@@ -798,9 +798,11 @@ const RightSection = () => {
                     border: '0.582754px solid #D7D7D7',
                     borderRadius: '6px',
                     padding: '12px',
-                    height: '380px',
+                    height: '32vh',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    minHeight: 0,
+                    overflow: 'hidden'
                   }}
                 >
                   <OrderItemsList

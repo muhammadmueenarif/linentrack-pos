@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import MainBody from './MainBody';
 import { OrderProvider, useOrder } from '../State/OrderProvider';
 
-const PosMainContent = () => {
+const PosMainContent = ({ isSidebarOpen }) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const { orderState } = useOrder();
 
@@ -26,17 +26,17 @@ const PosMainContent = () => {
 
   return (
     <div className="flex flex-grow w-full">
-      <MainBody onItemSelect={handleItemSelect} />
+      <MainBody onItemSelect={handleItemSelect} isSidebarOpen={isSidebarOpen} />
       <CollapsibleRightSidebar hideSidebar={orderState.showAddCustomerPopup} />
     </div>
   );
 };
 
-const PosMainComponent = () => {
+const PosMainComponent = ({ isSidebarOpen }) => {
   return (
     <div className="flex flex-grow w-full h-full">
       <OrderProvider>
-        <PosMainContent />
+        <PosMainContent isSidebarOpen={isSidebarOpen} />
       </OrderProvider>
     </div>
   );

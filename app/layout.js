@@ -15,6 +15,7 @@ import { Provider } from "react-redux";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import DotLoader from "./Common/Components/DotLoader";
+import { hasPOSAccess } from "./enum/AccessMode";
 
 // Import react-toastify components and CSS
 import { ToastContainer } from 'react-toastify';
@@ -37,7 +38,7 @@ function AuthCheck({ children }) {
       if (token && userData && pathname === '/Login') {
         try {
             const parsedData = JSON.parse(userData);
-            if (parsedData.roleType === 'Staff' && parsedData.accessMode === 'pos') {
+            if (parsedData.roleType === 'Staff' && hasPOSAccess(parsedData.accessMode)) {
               router.push('/');
             } else {
               router.push('/Login'); // Stay on login if not POS staff
@@ -70,7 +71,7 @@ function AuthCheck({ children }) {
       // Check if user has POS access
       try {
         const parsedData = JSON.parse(userData);
-        if (parsedData.roleType === 'Staff' && parsedData.accessMode === 'pos') {
+        if (parsedData.roleType === 'Staff' && hasPOSAccess(parsedData.accessMode)) {
           setIsLoading(false);
         } else {
           router.push('/Login'); // Redirect non-POS users
