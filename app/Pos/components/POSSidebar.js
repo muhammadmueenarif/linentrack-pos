@@ -39,21 +39,70 @@ const POSSidebar = ({ subscriptionData }) => {
     <div 
       className="fixed left-0"
       style={{
-        width: '280px',
-        height: 'calc(100vh - 64px)',
-        left: '0px',
-        top: '64px',
+        position: 'fixed',
+        left: '0',
+        width: '15%',
+        top: '61px',
+        height: 'calc(100vh - 61px)',
         background: '#1D50B6',
-        borderRadius: '0px',
-        zIndex: 1,
+        borderTopRightRadius: '13.9286px',
+        borderBottomRightRadius: '1.76812px',
+        zIndex: 10,
         margin: 0,
         padding: 0,
-        border: 'none'
+        border: 'none',
+        overflow: 'hidden'
       }}
     >
+      {/* Background Gradient Circles - Positioned as per design */}
+      {/* Circle 1: Bottom Left Corner */}
+      <div
+        style={{
+          position: 'absolute',
+          width: '200px',
+          height: '200px',
+          left: '-50px',
+          bottom: '-80px',
+          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 64.89%)',
+          opacity: 0.5,
+          borderRadius: '50%'
+        }}
+      />
+      
+      {/* Circle 2: Center Y-axis, attached to left side */}
+      <div
+        style={{
+          position: 'absolute',
+          width: '150px',
+          height: '150px',
+          top: '54%',
+          background: 'linear-gradient(rgba(255, 255, 255, 0.15) 0%, rgb(255 255 255 / 11%) 64.89%)',
+          opacity: 0.35,
+          borderRadius: '50%',
+          left: '-83px',
+          transform: 'translateY(-50%)'
+        }}
+      />
+      
+      {/* Circle 3: Top Right with margin, attached to right side */}
+      <div
+        style={{
+          position: 'absolute',
+          width: '300px',
+          height: '300px',
+          right: '-200px',
+          top: '50px',
+          background: 'linear-gradient(rgb(255 255 255 / 9%) 0%, rgba(255, 255, 255, 0) 64.89%)',
+          opacity: 0.5,
+          borderRadius: '50%',
+          transform: 'rotate(-87deg)'
+        }}
+      />
+      
       {/* POS Title */}
-      <div 
-        className="absolute text-white"
+      <button
+        onClick={() => setSelectedService('Dry Cleaning')}
+        className="absolute text-white cursor-pointer hover:opacity-80 transition-opacity"
         style={{
           position: 'absolute',
           left: '20px',
@@ -63,34 +112,45 @@ const POSSidebar = ({ subscriptionData }) => {
           fontWeight: 700,
           fontSize: '32px',
           lineHeight: '48px',
-          color: '#FFFFFF'
+          color: '#FFFFFF',
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          textAlign: 'left',
+          zIndex: 1
         }}
       >
         POS
-      </div>
+      </button>
 
       {/* Service Menu Items */}
-      <div className="absolute w-full" style={{ top: '80px', left: '0', right: '0', padding: '0 20px' }}>
+      <div className="absolute w-full" style={{ top: '0', left: '0', right: '0', bottom: '0', zIndex: 1 }}>
         {services.map((service, index) => {
           const isSelected = selectedService === service.name;
           const isDisabled = !service.enabled;
           
+          // Calculate positions for each item - spacing them vertically from the title
+          const titleHeight = 68; // Title height (20px top + 48px line-height)
+          const baseTop = titleHeight + 40; // Start below title with spacing
+          const itemSpacing = 48; // Spacing between items
+          const topPixels = baseTop + (index * itemSpacing);
+          
           return (
             <div
               key={service.id}
-              className={`relative cursor-pointer transition-all duration-200 ${
-                isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'
+              className={`relative transition-all duration-200 ${
+                isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-80'
               }`}
               onClick={() => !isDisabled && setSelectedService(service.name)}
               style={{
-                left: '0',
-                right: '0',
-                top: `${index * 35}px`,
-                height: '30px',
-                marginBottom: '5px',
+                position: 'absolute',
+                left: '20px',
+                top: `${topPixels}px`,
+                height: '24px',
                 display: 'flex',
                 alignItems: 'center',
-                padding: '6px 12px'
+                padding: '0',
+                zIndex: 2
               }}
             >
               {/* Icon Container */}
@@ -99,10 +159,7 @@ const POSSidebar = ({ subscriptionData }) => {
                 style={{
                   width: '19px',
                   height: '19px',
-                  background: 'rgba(217, 217, 217, 0.1)',
-                  border: '0.542857px solid #FFFFFF',
-                  borderRadius: '2.71429px',
-                  marginRight: '20px'
+                  marginRight: '12px'
                 }}
               >
                 <Image
@@ -110,7 +167,10 @@ const POSSidebar = ({ subscriptionData }) => {
                   alt={service.name}
                   width={19}
                   height={19}
-                  className="w-full h-full object-contain"
+                  style={{
+                    width: '19px',
+                    height: '19px'
+                  }}
                 />
               </div>
 
@@ -119,15 +179,17 @@ const POSSidebar = ({ subscriptionData }) => {
                 className="text-white flex items-center flex-grow"
                 style={{
                   fontFamily: 'Poppins',
-                  fontWeight: isSelected ? 900 : 500,
+                  fontStyle: 'normal',
+                  fontWeight: 400,
                   fontSize: '15.913px',
-                  lineHeight: '24px'
+                  lineHeight: '24px',
+                  color: isDisabled ? 'rgba(255, 255, 255, 0.5)' : '#FFFFFF'
                 }}
               >
                 {service.name}
               </div>
 
-              {/* Selection Indicator */}
+              {/* Selection Indicator - White vertical bar on the left */}
               {isSelected && (
                 <div 
                   className="absolute bg-white rounded-full"

@@ -95,7 +95,17 @@ const POSContent = () => {
       >
         <Navbar />
         <POSSidebar subscriptionData={subscriptionData} />
-        <div className="flex-1" style={{ marginLeft: '280px', marginTop: '64px', marginRight: '0px', paddingRight: '380px', paddingTop: 0, marginBottom: 0 }}>
+        <div 
+          className="flex-1" 
+          style={{ 
+            marginLeft: '15%', 
+            marginTop: '64px', 
+            marginRight: '0px', 
+            paddingRight: '380px', 
+            paddingTop: 0, 
+            marginBottom: 0 
+          }}
+        >
           <PosMainComponent />
         </div>
       </div>

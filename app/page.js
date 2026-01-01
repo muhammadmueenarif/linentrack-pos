@@ -82,7 +82,15 @@ const POSContent = () => {
     <div className="flex h-screen">
       <Navbar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
       {isSidebarOpen && <POSSidebar subscriptionData={subscriptionData} />}
-      <div className="flex-1" style={{ marginLeft: isSidebarOpen ? '280px' : '0px', marginTop: '70px', marginRight: '0px', transition: 'margin-left 0.3s ease' }}>
+      <div 
+        className="flex-1" 
+        style={{ 
+          marginLeft: isSidebarOpen ? '15%' : '0px', 
+          marginTop: '64px', 
+          marginRight: '0px', 
+          transition: 'margin-left 0.3s ease' 
+        }}
+      >
         <PosMainComponent isSidebarOpen={isSidebarOpen} />
       </div>
       <BackgroundBlur isActive={showPINPopup || hasManualClockIn} />
