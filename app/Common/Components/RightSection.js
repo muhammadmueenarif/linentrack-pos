@@ -462,15 +462,21 @@ const RightSection = () => {
       const userData = JSON.parse(userDataString);
       const currentStoreId = localStorage.getItem('selectedStoreId');
 
+      // Use ownerAdminId for staff accounts, otherwise use userData.id
+      const adminId = userData?.roleType === 'Staff' && userData?.ownerAdminId
+        ? userData.ownerAdminId
+        : userData?.id;
+
       console.log('orderData', {
         "userData": userData,
         "storeId": currentStoreId,
+        "adminId": adminId,
         "orderDetails": orderData
       });
       
       // Submit the order
-      if (currentStoreId && userData?.id) {
-        await submitOrder(userData.id, currentStoreId);
+      if (currentStoreId && adminId) {
+        await submitOrder(adminId, currentStoreId);
         showAlert('success', 'Order completed successfully!');
         resetOrder();
       } else {
@@ -733,14 +739,25 @@ const RightSection = () => {
           {featureConfig.priceList && featureConfig.express && (
             <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3 mb-4">
               <div className="w-full">
-                <Dropdown
-                  data={priceLists ? priceLists.map(list => list.name) : []}
-                  selected={selectedPriceList ? selectedPriceList.name : 'Default Price List'}
-                  onSelect={(value) => {
-                    const selectedList = priceLists.find(list => list.name === value);
+                <select
+                  value={selectedPriceList ? selectedPriceList.name : ''}
+                  onChange={(e) => {
+                    const selectedList = priceLists.find(list => list.name === e.target.value);
                     updateOrderField('selectedPriceList', selectedList);
                   }}
-                />
+                  className="w-full p-2 border rounded-md bg-white text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  style={{ border: '0.582754px solid #D7D7D7', borderRadius: '6px' }}
+                >
+                  {priceLists && priceLists.length > 0 ? (
+                    priceLists.map((list, index) => (
+                      <option key={index} value={list.name}>
+                        {list.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">Default Price List</option>
+                  )}
+                </select>
               </div>
               <div className="w-full flex items-center justify-center border rounded-lg p-2" style={{ border: '0.582754px solid #D7D7D7', borderRadius: '6px' }}>
                 <Switch
